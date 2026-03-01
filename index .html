@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduVision | Discover Anything</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #f97316;
+            --bg: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text: #f8fafc;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a { color: var(--text); text-decoration: none; font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover { color: var(--secondary); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 0 10%; position: relative;
+        }
+        .hero h1 { 
+            font-size: clamp(2.5rem, 6vw, 5rem); margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: fadeInDown 1s ease;
+        }
+        .cta-group { display: flex; gap: 1.5rem; margin-top: 2rem; }
+        .btn { 
+            padding: 1rem 2.5rem; border-radius: 50px; border: none; 
+            font-weight: 600; cursor: pointer; transition: 0.4s; text-decoration: none;
+        }
+        .btn-primary { 
+            background: var(--accent); color: white; 
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+            animation: pulse 2s infinite;
+        }
+        .btn-outline { background: transparent; border: 2px solid white; color: white; }
+        .btn:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+
+        /* --- IMAGE EXPLORATION --- */
+        .section { padding: 80px 10%; }
+        .visual-base { background: #1e293b; border-radius: 24px; padding: 40px; }
+        .upload-area {
+            border: 3px dashed rgba(255,255,255,0.2); border-radius: 20px;
+            padding: 60px; text-align: center; cursor: pointer; transition: 0.3s;
+        }
+        .upload-area:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); }
+        #image-preview { max-width: 100%; border-radius: 15px; margin-top: 20px; display: none; }
+        
+        .image-details { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; 
+            display: none; /* Hidden until upload */
+        }
+        .info-card { background: var(--card-bg); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* --- BOOK GRID --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 40px; }
+        .card { 
+            background: var(--card-bg); border-radius: 20px; padding: 20px; 
+            transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.1); }
+        .book-cover { height: 200px; background: linear-gradient(45deg, var(--primary), var(--secondary)); border-radius: 12px; margin-bottom: 15px; }
+
+        /* --- AI CHATBOT --- */
+        .ai-assistant {
+            position: fixed; bottom: 30px; right: 30px; z-index: 2000;
+        }
+        .ai-orb {
+            width: 70px; height: 70px; background: var(--primary);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+        }
+        .chat-window {
+            position: absolute; bottom: 90px; right: 0; width: 350px; height: 450px;
+            background: #1e293b; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: none; flex-direction: column; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .chat-header { background: var(--primary); padding: 15px; font-weight: 600; }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; font-size: 0.9rem; }
+        .chat-input { display: flex; padding: 15px; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .chat-input input { flex: 1; background: rgba(0,0,0,0.2); border: none; padding: 10px; border-radius: 10px; color: white; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo"><i class="fas fa-book-open"></i> EduVision</div>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#books">Books</a></li>
+            <li><a href="#images">Visual Explorer</a></li>
+            <li><a href="#topics">Topics</a></li>
+        </ul>
+        <div class="user-tools">
+            <i class="fas fa-moon" style="cursor:pointer"></i>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <h1>Discover Anything.<br>Learn Everything.</h1>
+        <p>Your AI-powered gateway to books, images, and knowledge.</p>
+        <div class="cta-group">
+            <button class="btn btn-primary">Start Learning Now</button>
+            <button class="btn btn-outline">Explore Library</button>
+        </div>
+    </section>
+
+    <section class="section" id="images">
+        <h2><i class="fas fa-camera-retro"></i> Visual Knowledge Base</h2>
+        <div class="visual-base">
+            <div class="upload-area" id="drop-zone">
+                <i class="fas fa-cloud-upload-alt fa-3x" style="margin-bottom:15px; color: var(--primary);"></i>
+                <h3>Drag & Drop or Click to Analyze Image</h3>
+                <p>Upload any image to get instant historical and cultural facts.</p>
+                <input type="file" id="file-input" hidden accept="image/*">
+            </div>
+            
+            <div class="image-details" id="details-view">
+                <div>
+                    <img id="preview-img" src="" alt="Preview">
+                </div>
+                <div class="info-card">
+                    <h3 id="img-title">Analyzing Image...</h3>
+                    <p id="img-desc" style="margin: 15px 0; color: #cbd5e1;">Please wait while EduVision AI scans the visual data...</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" style="padding: 10px 20px; font-size: 0.8rem;">Get Facts</button>
+                        <button class="btn btn-outline" style="padding: 10px 20px; font-size: 0.8rem;"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="books">
+        <h2><i class="fas fa-bookmark"></i> Trending Books</h2>
+        <div class="grid" id="book-grid">
+            </div>
+    </section>
+
+    <div class="ai-assistant">
+        <div class="chat-window" id="chat-box">
+            <div class="chat-header">EduVision AI Assistant</div>
+            <div class="chat-messages" id="messages">
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+                    Hi! I'm your learning assistant. Ask me about any book, topic, or image!
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Ask anything...">
+                <button class="btn-primary" style="width: 40px; height: 40px; border-radius: 50%; border:none;"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <div class="ai-orb" onclick="toggleChat()">
+            <i class="fas fa-robot"></i>
+        </div>
+    </div>
+
+    <script>
+        // 1. Book Data Generator
+        const books = [
+            { title: "The Quantum Frontier", author: "Dr. Aris Thorne", desc: "A deep dive into subatomic particles and the fabric of reality." },
+            { title: "Art Through Ages", author: "Elena Moretti", desc: "Exploring the Renaissance to modern digital masterpieces." },
+            { title: "Future of AI", author: "Sam Rivers", desc: "How neural networks are reshaping the global economy." },
+            { title: "Ancient Civilizations", author: "Sarah Jenkins", desc: "Uncovering the lost secrets of the Nile and beyond." },
+            { title: "Modern Psychology", author: "Dr. K. Vane", desc: "Understanding the human mind in the digital age." },
+            { title: "Sustainable Living", author: "Marcus Green", desc: "Practical guides for a zero-waste lifestyle." }
+        ];
+
+        const grid = document.getElementById('book-grid');
+        books.forEach(book => {
+            grid.innerHTML += `
+                <div class="card">
+                    <div class="book-cover"></div>
+                    <h3>${book.title}</h3>
+                    <p style="font-size: 0.8rem; color: #94a3b8;">by ${book.author}</p>
+                    <p style="margin: 10px 0; font-size: 0.9rem;">${book.desc}</p>
+                    <button class="btn btn-outline" style="width:100%; padding: 8px;">Read Summary</button>
+                </div>
+            `;
+        });
+
+        // 2. Chat Toggle
+        function toggleChat() {
+            const chat = document.getElementById('chat-box');
+            chat.style.display = (chat.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        // 3. Image Upload Simulation
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const detailsView = document.getElementById('details-view');
+
+        dropZone.onclick = () => fileInput.click();
+
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('preview-img').src = event.target.result;
+                    detailsView.style.display = 'grid';
+                    dropZone.style.display = 'none';
+                    simulateAIAnalysis();
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        function simulateAIAnalysis() {
+            const title = document.getElementById('img-title');
+            const desc = document.getElementById('img-desc');
+            
+            setTimeout(() => {
+                title.innerText = "Modern Architecture & Design";
+                desc.innerText = "This image showcases contemporary structural design focusing on sustainable materials. Fun Fact: Buildings like this use 40% less energy than traditional skyscrapers!";
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
